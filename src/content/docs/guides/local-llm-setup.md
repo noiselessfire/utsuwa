@@ -52,8 +52,34 @@ This starts the Ollama API on `http://localhost:11434`.
 1. Open **Settings** (gear icon)
 2. Navigate to the **Character** tab
 3. Enable the LLM toggle, then select **Ollama** from the provider dropdown
-4. Select a model from the model dropdown (click the refresh icon to reload the list from your server)
-5. Start chatting
+4. Leave the base URL as `http://localhost:11434` unless you changed Ollama's port
+5. Utsuwa will fetch models installed on your machine. Click the refresh icon if you just pulled a new model.
+6. Select an installed model from the dropdown
+7. Start chatting
+
+If the dropdown is empty, check your installed Ollama models with:
+
+```bash
+ollama list
+```
+
+If you are using the hosted website at `https://www.utsuwa.ai`, your browser connects directly to Ollama on your machine. Start Ollama with the Utsuwa origin allowed:
+
+```bash
+OLLAMA_ORIGINS=https://www.utsuwa.ai,https://utsuwa.ai ollama serve
+```
+
+If you are testing a Vercel preview, use the exact preview origin shown in the browser address bar, without the trailing slash:
+
+```bash
+OLLAMA_ORIGINS=https://your-preview.vercel.app ollama serve
+```
+
+For local development, use:
+
+```bash
+OLLAMA_ORIGINS=http://localhost:5173 ollama serve
+```
 
 ## LM Studio
 
@@ -79,8 +105,10 @@ This starts an OpenAI-compatible API on `http://localhost:1234`.
 1. Open **Settings** (gear icon)
 2. Navigate to the **Character** tab
 3. Enable the LLM toggle, then select **LM Studio** from the provider dropdown
-4. Select a model from the model dropdown (click the refresh icon to reload the list from your server)
-5. Start chatting
+4. Leave the base URL as `http://localhost:1234/v1` unless you changed LM Studio's port
+5. Utsuwa will fetch models from the running LM Studio server. Click the refresh icon if you load a different model.
+6. Select the loaded model from the dropdown
+7. Start chatting
 
 ## Recommended Models
 
@@ -100,14 +128,43 @@ If you're running the LLM server on a different machine or non-default port, ent
 - Remote machine: `http://192.168.1.50:11434`
 - Custom port: `http://localhost:8080`
 
+For Ollama, either `http://localhost:11434` or `http://localhost:11434/v1` works. Utsuwa uses `/api/tags` for model discovery and `/v1/chat/completions` for chat.
+
 ## Troubleshooting
 
 ### "Failed to fetch models"
 
-The LLM server isn't running. Start it:
+The LLM server may not be running or your browser may not be allowed to access it. Start the server:
 
 - Ollama: `ollama serve`
 - LM Studio: Go to the Server tab and click Start Server
+
+If you are using the hosted website with Ollama, restart Ollama with:
+
+```bash
+OLLAMA_ORIGINS=https://www.utsuwa.ai,https://utsuwa.ai ollama serve
+```
+
+For a Vercel preview, use the exact preview origin:
+
+```bash
+OLLAMA_ORIGINS=https://your-preview.vercel.app ollama serve
+```
+
+Then click the refresh icon in Utsuwa's model dropdown.
+
+### "model not found"
+
+The selected model is no longer installed locally, or the local server returned a stale model list.
+
+For Ollama:
+
+```bash
+ollama list
+ollama pull llama3.2
+```
+
+Then select the installed model from Utsuwa's model dropdown.
 
 ### "Connection refused"
 
@@ -131,7 +188,17 @@ Make sure the URL in Utsuwa matches the port your server is using.
 If you're running Utsuwa in a browser and getting CORS errors with Ollama, set the origins environment variable before starting the server:
 
 ```bash
-OLLAMA_ORIGINS=* ollama serve
+OLLAMA_ORIGINS=https://www.utsuwa.ai,https://utsuwa.ai ollama serve
 ```
+
+Ollama documents this under [allowing additional web origins](https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama).
+
+For Vercel previews, replace the value with the exact preview origin from the browser address bar:
+
+```bash
+OLLAMA_ORIGINS=https://your-preview.vercel.app ollama serve
+```
+
+If you use multiple Utsuwa origins, comma-separate them. Use `OLLAMA_ORIGINS=http://localhost:5173` for local development, or `OLLAMA_ORIGINS=*` only if you intentionally want to allow any browser origin on your machine.
 
 This isn't needed when using the desktop app.
