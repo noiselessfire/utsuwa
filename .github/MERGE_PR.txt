@@ -1,0 +1,4 @@
+This file is used to track PR creation.
+PR: Merge NSFW Locomotion module into main
+Branch: merge/nsfw-locomotion -> main
+Description: Integrate NSFW Locomotion system as a module within the utsuwa repository
